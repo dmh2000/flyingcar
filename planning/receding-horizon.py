@@ -1,36 +1,66 @@
-import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-import numpy.linalg as LA
 
-from fcar import grid, data, astar, utils
+from fcar.planning import environment, data, astar, utils
 
 
-def local_grid(grid):
+def create_graph(data, drone_altitude, safety_distance):
+    """
+    create a grid and graph for astar planning
+    :param data:
+    :param drone_altitude:
+    :param safety_distance:
+    :return: populated grid , edges (for display) and voronoi graph though open paths
+    """
+    grid, edges = environment.create_grid_and_edges(data, drone_altitude, safety_distance)
+    print('Found %5d edges' % len(edges))
+
+    # =====================================
+    # create graph
+    # =====================================
+    # create the graph with the weight of the edges
+    # set to the Euclidean distance between the points
+    G = nx.Graph()
+
+    for e in edges:
+        dist = utils.euclidian_distance(e[0], e[1])  # LA.norm(np.array(e[0]) - np.array(e[1]))
+        G.add_edge(e[0], e[1], weight=dist)
+
+    return G, edges, grid
+
+
+def local_graph(graph, p1=None, p2=None):
     """
     add any new obstacle to subset of grid
-    :param G: input grid
+    :param graph: input grid
+    :param p1: start point
+    :param p2: end point
     :return:  updated grid
     """
-    return G
+    return graph
 
 
-def local_path(G, grid, lcl,p1,p2):
+def local_path(G, grid, lcl, p1, p2):
     """create local path from p1 to p2"""
-    G = local_grid(grid)
-    print(p1,p2)
-    path, _ = astar.a_star_graph(G, utils.norm_distance, p1,p2)
+
+    # create a local graph
+    lcl_graph = local_graph(G)
+
+    # plan over the local graph from p1 to p2
+    path, _ = astar.a_star_graph(lcl_graph, utils.norm_distance, p1, p2)
+    print(path)
     for p in path:
         lcl.append(p)
     return lcl
 
 
-def show_grid(grid, edges, path1,path2):
+def show_grid(grid, edges, path1, path2):
     """
     plot the grid with edges and path (if they exist)
     :param grid: 2D grid
     :param edges: networx graphs edges or None
-    :param path: array of points in path or None
+    :param path1: array of points in path or None
+    :param path2: array of points in path or None
     :return: none
     """
     plt.imshow(grid, origin='lower', cmap='Greys')
@@ -53,7 +83,7 @@ def show_grid(grid, edges, path1,path2):
         p1 = path2[0]
         for p in path2[1:]:
             p2 = p
-            plt.plot([p1[1], p2[1]], [p1[0], p2[0]], 'g-',linewidth=3)
+            plt.plot([p1[1], p2[1]], [p1[0], p2[0]], 'g-', linewidth=3)
             p1 = p2
 
     plt.plot(start[1], start[0], 'rx')
@@ -61,8 +91,8 @@ def show_grid(grid, edges, path1,path2):
     plt.grid()
     plt.xlabel('EAST')
     plt.ylabel('NORTH')
-    plt.xticks([x for x in range(0,1000,50)])
-    plt.yticks([y for y in range(0,1000,50)])
+    plt.xticks([x for x in range(0, 1000, 50)])
+    plt.yticks([y for y in range(0, 1000, 50)])
     plt.show()
 
 
@@ -75,7 +105,6 @@ plt.rcParams['figure.figsize'] = 14, 14
 data = data.colliders()
 print("data :", len(data))
 
-
 # grid without edges
 # flight_altitude = 5
 # safety_distance = 3
@@ -86,19 +115,22 @@ print("data :", len(data))
 # =====================================
 drone_altitude = 5
 safety_distance = 3
-grid, edges = grid.create_grid_and_edges(data, drone_altitude, safety_distance)
-print('Found %5d edges' % len(edges))
+
+#grid, edges = environment.create_grid_and_edges(data, drone_altitude, safety_distance)
+#print('Found %5d edges' % len(edges))
 
 # =====================================
 # create graph
 # =====================================
 # create the graph with the weight of the edges
 # set to the Euclidean distance between the points
-G = nx.Graph()
+#G = nx.Graph()
 
-for e in edges:
-    dist = utils.euclidian_distance(e[0],e[1]) # LA.norm(np.array(e[0]) - np.array(e[1]))
-    G.add_edge(e[0], e[1], weight=dist)
+#for e in edges:
+#    dist = utils.euclidian_distance(e[0], e[1])  # LA.norm(np.array(e[0]) - np.array(e[1]))
+#    G.add_edge(e[0], e[1], weight=dist)
+
+G, edges, grid = create_graph(data,drone_altitude,safety_distance)
 
 # =====================================
 # get start/goal
@@ -119,10 +151,10 @@ path, cost = astar.a_star_graph(G, utils.norm_distance, start, goal)
 print(path)
 
 # new path
-new_path=[]
+new_path = []
 
-# create course path
-path=[path[i] for i in range(0,len(path),20)]
+# create coarse path
+path = [path[i] for i in range(0, len(path), 20)]
 
 # go to each point in path
 # add start position
@@ -130,7 +162,7 @@ new_path.append(path[0])
 p1 = new_path[0]
 for p2 in path[1:]:
     # add local path to existing path
-    new_path = local_path(G,grid, new_path,p1,p2)
+    new_path = local_path(G, grid, new_path, p1, p2)
     p1 = p2
 new_path.append(goal)
 
