@@ -102,7 +102,7 @@ plt.rcParams['figure.figsize'] = 14, 14
 # =====================================
 # get colliders
 # =====================================
-data = data.colliders()
+data = data.colliders("colliders.csv")
 print("data :", len(data))
 
 # grid without edges

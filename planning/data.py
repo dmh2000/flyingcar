@@ -7692,6 +7692,14 @@ data = np.array([[ -3.10238900e+02,  -4.39231500e+02,   8.55000000e+01,   5.0000
  [  2.81516200e+02,   3.54415600e+02,   4.99935100e+00,   1.05377200e+00,
     1.05377200e+00,   4.95024600e+00]])
 
-def colliders():
-    return data
+def colliders(filename=None):
+    if filename is None:
+        return data
+    else:
+        # This is the same obstacle data from the previous lesson.
+        filename = 'colliders.csv'
+        csv_data = np.loadtxt(filename, delimiter=',', dtype='Float64', skiprows=2)
+        return csv_data
+
+
 
