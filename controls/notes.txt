@@ -1,0 +1,42 @@
+forces on a quadrotor
+
+gravity/weight, thrusts
+translation equilibrium (hover)
+rotational equilibrium (pointing)
+moment
+
+omega = rotation rate of motor (radians/sec)
+kf and Km are empirically derived constants
+
+
+rotational force and moment are proportional to omega squred
+F = Kf * omega**2
+M = Km * omega**2
+
+F = m * aa
+Fz = m*Z-dot-dot
+Tau = I * alpha
+Mz = Iz * psi_dot_dot
+
+G = 9.81
+weight = mass * G
+mass = weight / G
+G = weight / mass
+
+torque
+
+net torque = tau = I * alpha
+alpha = angular acceleration radians/sec**2
+I = moment of inertia
+Mz = Iz * psi_dot_dot (angular acceleration)
+
+
+FORCE
+imbalanced forces cause acceleration
+F = ma (vectors)
+
+vertical Fz = m*z_dot_dot (second derivative of position)
+
+F = 2.2 kg * -9.8 + 2.2 * -4
+
+Mz = Iz * psi_dot_dot = Km * omega**2 = M
