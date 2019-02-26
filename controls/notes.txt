@@ -13,7 +13,19 @@ rotational force and moment are proportional to omega squred
 F = Kf * omega**2
 M = Km * omega**2
 
-F = m * aa
+vertical acceleration
+1.
+F1 = Kf * omega_1**2
+F2 = Kf * omega_2**2
+Fg = M * g
+z_dot_dot = Fg - F1 - F2
+z_dot_dot = (M * g - Kf * O1**2 - Kf * O2**2) / M
+2.
+z_dot_dot = self.g - (self.k_f / self.m) * (self.omega_1**2 + self.omega_2**2)
+z_dot_dot = g - (kf * O1**2 + Kf * O2**2) / M
+
+
+F = m * a
 Fz = m*Z-dot-dot
 Tau = I * alpha
 Mz = Iz * psi_dot_dot
@@ -30,6 +42,8 @@ alpha = angular acceleration radians/sec**2
 I = moment of inertia
 Mz = Iz * psi_dot_dot (angular acceleration)
 
+psi_dot_dot = Mz / Iz
+
 
 FORCE
 imbalanced forces cause acceleration
@@ -40,3 +54,13 @@ vertical Fz = m*z_dot_dot (second derivative of position)
 F = 2.2 kg * -9.8 + 2.2 * -4
 
 Mz = Iz * psi_dot_dot = Km * omega**2 = M
+
+
+1. Rotation Rates ->
+Ft, Mx,My,Mz
+
+2. Fz -> z_dot_dot
+   Mz -> psi_dot_dot
+
+3. Z_dot_dot -> integrate -> integrate -> z
+   psi_dot_dot -> integrate -> integrate -> psi

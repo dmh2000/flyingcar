@@ -62,9 +62,6 @@ def create_grid(data, drone_altitude, safety_distance):
     return grid
 
 
-# Here you'll modify the `create_grid()` method from a previous exercise
-# In this new function you'll record obstacle centres and
-# create a Voronoi graph around those points
 def create_grid_and_edges(data, drone_altitude, safety_distance):
     """
     Returns a grid representation of a 2D configuration space

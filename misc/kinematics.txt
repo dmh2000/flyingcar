@@ -1,0 +1,44 @@
+kinematics constraints:
+    ignoring mass or forces
+    based on geometry of environment
+
+differential constraints:
+    based on derivative of state
+
+holonomic: no differential constraints
+
+quasi-holonomic: seem to have no differential constraints
+    can move any direction
+
+dynamic constraints : form of differential constraints
+    forces and mass
+
+
+examples:
+
+can tolerate any crosswind but can't fly upwind
+    x-dot > 0   (velocity is x direction is > 0)
+
+acceleration constraints
+
+vehicle model
+
+dubins car
+    (x,y,theta)
+    x-dot = cos(theta)
+    y-dot = sin(theta)
+    angle = U-phi
+    theta-dot = tan(U-phi)
+    U-dot -> [-pi/2,pi/2]
+    velocity = 1m/sec forward
+
+def generate_RRT(x_init, num_vertices, dt):
+    rrt = RRT(x_init)
+    for k in range(num_vertices):
+        x_rand = sample_state()
+        x_near = nearest_neighbor(x_rand, rrt)
+        u = select_input(x_rand, x_near)
+        x_new = new_state(x_near, u, dt)
+        # directed edge
+        rrt.add_edge(x_near, x_new, u)
+    return rrt

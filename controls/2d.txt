@@ -1,0 +1,29 @@
+roll = phi
+pitch = theta
+yaw = psi
+
+2D copter
+
+X = [z,y,phi,z_dot,y_dot,phi_dot]
+
+Fthrust
+sin(psi) = Fy / Fthrust
+cos(psi) = Fz / Fthrust
+Fz = Fthrust * cos(psi)
+Fy = Fthrust * sin(psi
+
+Ft = 120
+m = 10
+psi = 30 * (np.pi / 180.0)
+Fy = Ft * np.sin(psi)
+a = Fy / m = 6.0 m/sec**2
+
+torque = tau = F * Dperpendicular = F * L (length)
+Mx = F * Dperp,x (lateral : Y props)
+l = sin(angle) * L (length)
+
+
+Ft Translation
+Mx Roll
+My Pitch
+Mz yaw  (reaction moment of rotors)
