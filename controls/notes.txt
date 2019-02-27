@@ -64,3 +64,41 @@ Ft, Mx,My,Mz
 
 3. Z_dot_dot -> integrate -> integrate -> z
    psi_dot_dot -> integrate -> integrate -> psi
+
+
+PD Controller -> double integrator system
+        err = z_target - z_actual
+        err_dot = z_dot_target - z_dot_actual
+        u_bar = self.k_p * err + self.k_d * err_dot + z_dot_dot_ff
+        u = self.vehicle_mass * (self.g - u_bar)
+
+e = position error
+e_dot = velocity error
+u_bar = desired acceleration
+omega_n = natural frequency of oscillation
+k_d = derivative_constant = 2 * damping factor * natural frequency of oscillation = 2 * d * omega_n
+K_p = proportional constant = natural frequency of oscillation ** 2 = omega_n ** 2
+e_dot_dot + 2 * d * omega_n * e_dot + omega_ n**2
+
+Overshoot
+T_rise ->
+T_settle -> +-2% of target
+
+Tuning
+to decrease rise time, increase omega_n
+1. 0.7 < d < 1.0  damping ratio
+2. choose large omega_n for smaller rise and settling time subject
+   to system contraints
+
+   T = 1 / omega_n
+   T_rise = 1.57 * T
+
+choose damping ratio, then iterate omega_n
+
+PID controller
+u_bar = z_dot_dot_ff + Kp * e + Ki * accumulated error + Kd * e_dot
+T = time_constant
+Kp = (1/T**2) * (1 + 2d)
+Ki = 1 / T**3
+Kd = (1/T) * (1 + 2d)
+
