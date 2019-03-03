@@ -102,3 +102,44 @@ Kp = (1/T**2) * (1 + 2d)
 Ki = 1 / T**3
 Kd = (1/T) * (1 + 2d)
 
+
+
+=========================================
+2D cascaded controller
+=========================================
+u = commanded thrust
+u_bar = desired acceleration
+z_dot_dot = g - u/m
+z_dot_dot = u_bar
+phi = roll
+
+2D dynamics
+-----------
+omega = rotational velocity
+F = force
+F = Kf * omega**2
+
+U1 = total collective thrust
+U1 = Kf(omega1**2 + omega2**2)
+U2 = total moment around x (roll) axis
+Mx = length * F
+Mx = length * Kf * omega**2
+U2 = length * Kf * (omega1**2 - omega2**2)
+
+
+y_dot_dot = u1/m * sin(phi)
+z_dot_dot = g - u1/m * cos(phi)
+phi_dot_dot = u2 / Ixx
+
+# solution values
+z_k_p   = 0.1
+z_k_d   = 10.0
+y_k_p   = 0.3
+y_k_d   = 10.0
+phi_k_p = 150.0
+phi_k_d = 50.0
+
+# nonlinear dynamics
+u1 = m * (g - u1_bar)/cos(phi)
+phi_cmd = arc_sin((m * y_dot_dot_targ) / u1)
+u2 = Ix * u2_bar
