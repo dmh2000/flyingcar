@@ -1,0 +1,154 @@
+1. identify state
+2. identify forces and moments
+3. derive linear and angular accelerations
+4. double integrate to get y,z,phi
+
+3D Dynamics
+----------
+
+inertial frame : fixed in world
+    position is in inertial frame
+
+body frame  : attached to drone
+    x -> forward
+    y -> lateral
+    z -> down
+    imu is in body frame
+
+3D State : 12 variables
+-----------------------
+x,y,z               location
+phi,theta,psi,      orientation/attitude  (inertial frame)
+x_dot,y_dot,z_dot   velocity
+p(x),q(y),r(z)      body rates (angular rates in body frame, roll, pitch, yaw)
+p_dot,q_dot,r_dot   angular accelerations
+
+3D Forces and momemts
+---------------------
+net collective force : sum of rotors (positive down)
+net torque : attitude doesn't matter
+
+find translation motion from linear forces
+find rotational motion from angular moments
+
+1. propeller rotation rates :F, Mx, My, Mz
+2. translation : F -> x, y, z
+3. world frame rotations : Mx, My, Mz -> phi, theta, psi
+
+Advancing rotational motion
+----------------------------
+1. use euler's equations to get p_dot,q_dot,r_dot
+2. integrate p_dot,q_dot,r_dot to get p,q,r
+3. convert p,q,r to phi_dot,theta_dot,psi_dot
+4. integrate phi_dot,theta_dot,psi_dot to get phi,theta,psi
+
+Euler's equations
+-----------------
+moments cause rotational acceleration
+Mz = Iz * psi_dot_dot
+
+M = length 3 vector of moments
+I = 3x3 matrix
+omega_dot = length 3 vector of rotational accelerations
+only works in world frame -> how to get to body frame
+
+inertial frame to body frame:
+-------------------------------------------
+M = tau = torque
+I = inertia
+
+M = I * omega_dot + omega X (I*omega)
+I * omega_dot = M - omega X (I*omega)
+omega_dot = (M - omega X (I*omega) / I
+-------------------------------------------
+a X b = c where c is a vector perpendicular to both a and b
+direction is given by right handle rule
+magnitude is |c| = |a| * |b| * sin(theta)
+
+Instantaneous turn rate in body frame to instantaneous turn rate in world frame Euler angles
+--------------------------------------------------------------------------------------------
+phi      [1,sin(phi)*tan(theta)  cos(phi) * tan(theta)][p]
+theta  = [0,cos(phi)             -sin(phi)            ][q]
+psi      [0,sin(phi)/cos(theta)  cos(phi) / cos(theta)][r]
+
+3D controller diagram
+---------------------
+altitude controller   - PD (second order)
+    target    : Z,Z_dot
+    estimated : z,dz,phi,theta,psi
+    command   : u_1
+
+lateral controller    - PD (second order)
+    target    : X,X_dot,Y,Y_dot
+    estimated : x,dx,y,dy
+    command   : X_dot_dot, Y_dot_dot
+
+yaw controller        - P  (first order)
+    target    : psi
+    estimated : psi
+    command   : r
+
+roll/pitch controller - P (first order)
+    target    : U_1 (total thrust), X_dot_dot, Y_dot_dot
+    estimated : phi,theta,psi
+    command   : p,q
+    from paper : equations 2 and 6
+
+body rate controller  - P (first order)
+    target    : commanded p,q,r
+    estimated : p,q,r
+    command   : u_2,u_3,u_4 (rotational moment commands)
+
+
+Quadcopter dynamics
+===================
+
+rotation matrix
+----------------
+R = (attitude)
+    [  position,velocity, accel = b_x]
+    [  position,velocity, accel = b_y]
+    [  position,velocity, accel = b_z]
+
+third column of rotation
+b_x = R13
+b_y = R23
+b_z = R33
+
+b_x,b_z are control knobs for x,y
+
+Rotation matrix evolves every dt by:
+R_dot = (velocity)
+    [   0, -r_t,  q_t]
+R * [ r_t,    0, -p_t]
+    [-q_t,  p_t,    0]
+
+linear accelerations
+--------------------
+[ddx,ddy,ddz] = R * [0,0,C] - [0,0,g]
+ddx = c*b_x      -> b_x_c
+ddy = c*b_y      -> b_y_c
+ddz = c*b_z - g  -> b_z_c
+
+c -> colletive thrust
+altitude control
+----------------
+zeta = damping ratio
+ddz = (2*zeta/tau_z) * (dz - dz_cmd)-(1/tau_z**2)*(z - z_cmd) + cmd_ddz
+
+collective thrust
+-----------------
+cmd_C = (ddz + g) / bz
+bz = from third column of rotation matrix
+
+angular rates (body frame)
+--------------------------
+b_dot_x_c = (b_x - b_x_c)/Tau_rp
+b_dot_y_c = (b_x - b_x_c)/Tau_rp
+[pc,qc] = 1/R33 * [R21 -R11,R22 -R12][b_dot_x_c,b_dot_y_c]
+
+
+
+
+
+
