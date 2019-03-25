@@ -1,0 +1,75 @@
+Rate Gyros
+----------
+measure coriolis force
+
+omega~ = omega+ b + n
+    omega = angular velocity
+    b = bias
+    n = gaussian noise
+    womega~ = estimate
+    epsilon = maximum approximation error
+theta[t] = theta[t-1] + omega~ * delta[t] + epsilon
+bias is calibrated and remoted
+
+dead reckoning
+    navigation by inertial sensor only
+
+accumulated uncertainty
+sigma_t^2 = sigma_t-1^2 + sigma^2*dt^2
+    sigma_t is accumulated uncertainty
+    sigma is measurement uncertainty
+
+true_angle = true_angle + omega * dt + accumulated_sigma
+measured_angle =  measured_angle + measured_omega * dt
+accumulated_sigma =  np.sqrt(accumulated_sigma**2 + sigma_omega**2 * dt**2)
+
+use 3 sigma envelope
+
+full 3d update
+--------------
+derivative of euler angles
+
+current attitude * body rate (pqr)
+
+Instantaneous turn rate in body frame to instantaneous turn rate in world frame Euler angles
+--------------------------------------------------------------------------------------------
+phi_dot      [1,sin(phi)*tan(theta)  cos(phi) * tan(theta)][p]
+theta_dot  = [0,cos(phi)             -sin(phi)            ][q]
+psi _dot     [0,sin(phi)/cos(theta)  cos(phi) / cos(theta)][r]
+
+phi/theta  to euler angles
+--------------
+phi_dot      [1,sin(phi)*tan(theta)][p]
+theta_dot  = [0,cos(phi)           ][q]
+
+Euler Forward Method
+--------------------
+A = phi,theta,psi
+A_t = A_t-1 + A_dot * dt
+
+
+Accelerometers
+----------------
+a = 1/m * F
+Measure specific acceleration (all forces except gravity)
+Fsprings = Fs,up - Fs,down (upper and lower spring)
+Fsprings = mg
+
+Resting measurement
+a = g,up
+
+Free Fall
+a = 0
+
+a_accel = 1/m (F - Fg)
+
+Dead Reckoning 3D
+X = [x,y,z,theta,phi,x_dot,y_dot,z_dot]
+assume psi == 0
+
+with psi == 0, rotation matrix is
+[phi_dot  ] = [1 sin(phi)tan(theta)][p]
+[theta_dot] = [0 cos(phi)           [q]
+
+
+

@@ -1,0 +1,161 @@
+probability mass function for discrete events
+
+P(Working)  = Frequency of  Working / Total number of events = 9 / (9+1) = 0.9
+P(!WOrking) = Frequency of !Working / Total number of events = 1 / (9+1) = 0.1
+
+Conditional probability
+Given a probability mass function and given some outcome, what is probability of some other outcome
+
+Map outcomes to integers : Random Variable
+X0 = working  = 0 = 0.9
+X1 = !working = 1 = 0.05
+X2 = ~working = 2 = 0.05
+-------------------------
+sum(Xn)             1.0
+
+Normalization - A probability is normalized when the probabilities sum to 1.0. 
+Any mathematically correct distribution must be normalized, 
+but un-normalized distributions can also be useful if we 
+just want to compare relative probabilities.
+
+Conditional Probability - The conditional probability p(A|B) gives the probability 
+of event A given that event B has already occurred.
+
+Random Variable - A random variable is a variable whose 
+possible values are outcomes of some random phenomenon.
+
+EXPECTED VALUE
+E[X] = sum(xi * p(xi)) over all i 
+
+E[X] = 0 * 0.9 + 1 * 0.05 + 2 * 0.05 = 0.15
+
+number of Satellites : probability of number of satellites
+1                       0.1
+2                       0.1
+3                       0.3
+4                       0.3
+5                       0.1
+6                       0.1
+E[X] = 1*0.1 + 2*0.1 + 3*0.3 + 4*0.3 + 5*0.1 + 6*0.1 = 3.5
+tells something about how many satellites we might see at a given time
+
+VARIANCE
+x_bar = expected value = mean
+sigma**2 = sum(x - x_bar)**2 * p(x)
+
+STANDARD DEVIATION
+sigma = sqrt(variance)
+
+Cumulative Distribution Function
+Fx(u) = p(x <= u)
+
+Probability Density Function (PDF)
+fx(u) = dFx(u) / du
+
+Probability of a value in a range:
+p(x1 < x < x2) = integral from x1 to x2 of fx(x)/dx
+area under probability density function curve for that range
+
+Uniform and Gaussian Distributations
+
+Uniform : u,v or u+width
+Gaussian : mean u (mu) sigma^2 (variance)
+1 std deviation = 68%
+3 std deviation = 99.7%
+sigma indicates width of curve
+small sigma is 'good', large sigma 'bad'
+
+Sensor noise modeled as gaussian variable
+    get the parameters of this variable
+
+estimates x-hat, sigma-hat**2
+
+method of moments for estimation
+x-hat = average of sum of all samples
+sigma-hat = average variance
+
+VECTORS - multivariable
+-----------------------
+are the variables independent?
+variable [x1,x2,...,xn]
+normalization integral...integral fx(x)dx1,dx2,...dxm = 1
+mean integral...integral xf(x)dx1,dxn..dxn
+upper case sigma = COVARIANCE
+spread = integral..integral (x - u)(x-u)Tfx(x)dx1,dx2...dxn
+
+covariance
+
+Sum(X) = 5 + 12 + 18 + 23 + 45 = 103
+XMean = 20.6
+Sum(Y) = 2 + 8 + 18 + 20 + 28 = 76
+YMean = 15.2
+Covariance(X,Y) = SUM(xi - xmean)*(yi - ymean)/(samplesize -1)
+
+
+multivariate gaussian
+
+eigenvalues and eigenvectors describe direction and magnitude of the covariance
+
+Joint Distribution
+   p(x) = p(x1,x2) if x = [x1,x2]
+
+Marginal Distribution -
+    to get p(x1) out of a joint distribution of [x1,x2]
+    integrate out the uneeded variables
+    p(x1) = Integral p(x1,x2)dx2
+
+Independence : joint probability is product of the individual probabilities
+    p(x1,x2) = p(x1) * p(x2)
+
+Correlation
+    chi-square test
+
+    Pearson Product-Moment correlation
+    p1,2 = cov(x1,x2) / (sigma_x1*sigma_x2)
+
+Conditional Distribution
+p(x|y) = p(x,y) / p(y)  = joint / marginal of y = chain rule
+  probability of x given y = probabilty of x and y / probability of y
+
+what if we have p(y|x) ? use chain rule twice
+p(x,y) = joint distribution
+p(x|y) = conditional distributation
+derivation:
+    p(x,y) = p(y) * p(x|y) axiom
+    p(x,y) = p(x) * p(y|x) axiom
+    p(y) * p(x|y) = p(x) * p(y|x)
+    p(x|y) = p(x) * P(y|x) / p(y)
+
+
+Bayes Rule
+P(x|y) = p(x)p(y|x)/p(y)
+
+prior : where we think we are (gaussian) N(ux,sigma_x^2)
+make a measurement y = x + v
+    x = true position
+    v = error
+    v ~ N(0,sigma_v^2)
+    y = received value
+we want to know where we are now
+    p(x|y)  new position given measurement
+
+p(x|y) = p(x)*p(y|x) / p(y)
+plug in the normal distributions
+p(x|y) = N(u,sigma^2)
+
+we know p(x), p(y|x), p(y). all three are normal distributions
+so go head and multiply the values to get p(x|y)
+
+measurement is applied as a corrections to initial estimate
+to get new estimate
+prior = u_x
+u = u_x + (sigma_x^2 / (sigma_x^2 + sigma_v^2)(y - u_x)
+high measurement noise : if we trust u_x, then sigma_v^2 is small
+low  measurement noise : if we trust v, then sigma_x^2 is small
+
+
+
+
+
+
+

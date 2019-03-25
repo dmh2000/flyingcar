@@ -1,0 +1,91 @@
+goal : estimate x_hat from unknown state x
+
+estimators have 3 things
+1. measurement model H
+2. make m measurements y of true state x
+   y = Hx + v  (new state if H is perfect, i.e. v = 0)
+3. mathematical model of noise
+    v = 0 mean gaussian with covariance R
+    v ~ N(0,R)
+
+Methods
+-------------
+Least Squares
+    measurements come in at once
+    measurement model is nxm matrix
+    maps 1 true state to m measurements
+    model is linear
+
+Recursive
+    measurements come in one at a time
+    is linear
+    is a vector
+    maps 1 true state to 1 measurement
+
+Non-Linear Least Squares
+    measurement come in one at a time
+    model is an arbitrary function to map true state to measurement
+
+Vehicle must be stationary for these to work
+
+Variables
+x the unknown state vector
+H the linear measurement model
+v the measurement noise from N(0,R)
+R the covariance of v
+m the number of measurements made
+n the state vector x
+y_hat the actual noisy state measurements
+
+Least Squares
+    assumptions
+        stationary vehicle
+        measurements all at once
+        H is linear (y = Ax + b)
+    use for stationary calibration
+
+    y = Hx + v
+    x is constant state vector of length n
+    y = vector of measurements
+    v = unknown error vector , use a gaussian N(0,R)
+    H = measurement matrix projects state into measurement space
+    use maximum likelihood estimator
+
+Maximum Likelihood Estimator
+x = unknown state vector
+y~ is actual noisy measurements
+H is linear measurement model
+v = noise where N(0,R)
+R = covariance of noise
+m = number of measurements
+n = length of state vector x
+x_hat = (HT*T)-1*HT*y~
+
+x = [a,b]  unknown state vector
+yi = at + b + v
+y~ = Hx + v
+
+
+Recursive least squares
+    Maximum A Posteriori Estimate
+    make m measurements y of unknown state x such that y = Hx + v
+    x = unknown state vector
+    y~ is actual noisy measurements
+    H is linear measurement model
+    v = noise where N(0,R)
+
+    p(x) = prior ~ N(x_hat[0],Q[o])
+    1. find PDF of p(x|y)
+       P(x|y) = p(x)(p(y|x)/p(y)
+       = aN(Hx,R) @ N(x[0], Q[0])
+    2. choose X-hat as MAP
+        p(x_hat,y~) = N(x_hat[1],Q[1])
+        Q1 = (Qo^-1 + H.T * R^-1 * H) ^-1
+        x_hat[1] = x_hat[0] + Q[1]*H.T * R^(y~ - H*x_hat[0])
+
+Non-Linear Least Squares
+    measurements = h(x) are nonlinear
+    h(x) = h(h_hat0) + Hx_hat0 * (x - x_hat0)
+    1. construct the jacobian (of derivatives of h
+    2. compute posterior covariance Q1 (see recursive notebook)
+    3. compute posterior mean esimate (x_hat1)
