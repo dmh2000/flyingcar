@@ -1,0 +1,115 @@
+probablistic measurement model
+p(z|x) : likelihood of getting measures Z given that i'm actually in state x
+
+typically gaussian
+
+
+
+Averaging measurements
+
+1. read sensor over and over
+2. incorporate knowledge of vehicle dynamics
+
+x_t time and unknowable state at time t
+z_t observation at time t
+x_hat_t estimate of true state at time t
+
+Recursive Update
+----------------
+x_hat_t = f(x_hat_t-1,z_t)
+
+// averaging over time
+x_hat_t = 1/t * (x_hat_t-1 * (t-1) + z_t)
+
+respects markov assumption :
+    only depends on current measurement and previous estimate, not all previous ones
+
+eventually new measurements don't affect average as much
+
+use an alpha filter that weights the input vs the history
+x_hat_t = alpha * x_t-1 + (1-alpha) * z_t
+0 < alpha < 1
+
+x_t : estimated position
+u_t : control input
+z_t : measurement input
+
+def predict(bel(x_t-1),u_t,dt):
+    # bayes rule
+    # new belief = probability of x_t given (u_t,x_t-1) * belief(x_t-1) * dx(t-1)
+    # bel_hat = integral of P(x_t|u_t,x_t-1) * bel(x_t-1) dx(t-q)
+    return bel_hat(x_t)
+
+def update(bel_hat(x_t),z_t):
+    bel(x_t) = gauusian * probability(zt|x_t)bel(x_t)
+    return belief(x_t)
+
+def bayes_filter:
+    u_t = control(bel(x_t-1))
+    bel_hat(x_t) = predict(bel(x_t-1), u_t,dt)
+    zt = read_sensor()
+    bel(x_t) = update(bel_hat(x_t),z_t)
+
+u_t = mean
+SIGMA_t = covariance
+
+def extended_kalman_filter:
+   u_t = control(u_t-1,SIGMA_t-1)
+   u_bar_t,SIGMA_t = predict(u_t-1,Sigma_t-1,u_t,dt)
+   z_t = sensor
+   u_t,Sigma_t = update(u_bar_t,Sigma_t,z_t)
+
+
+1D Drone
+----------
+x_t = [z_dot,z]
+u_t = [z_dot_dot]
+
+advance_stat(x_t,u_t,dt):
+ z_dot = [Xt,z_dot + u_t,z_dot_dot * dt]
+ z     = [x_t,z + x_t,z_dot * dt]
+
+ = [1  0] [z_dot] + [dt] * [z_dot_dot]
+   [dt 1] [z    ]   [0 ]
+
+= A_t*x_t + B_t*u_t
+
+define state transition function for prediction
+   g(x_t,u_t,dt)
+
+define measurement model
+   h(x_t) [x_t,z]
+   = [0 1] [z_dot,z]
+   = Ct[z_dot,z]
+   = C_t*x_t
+
+A = matrix for estimate
+B = matrix for control input
+C = matrix for measurement model
+
+
+extended kalman filter
+
+state transition function
+g(x_t,u_t,dt) =
+   [u_t   , phi]
+   [x_t   , y_dot - sin(phi) * dt]
+   [x_t   , y + y_dot * dt]
+
+Linearizing 'sin'
+
+sin(phi)
+take jacobian of x_t = [phi,y_dot,y]
+
+this jacobian best linear approximation of g near state x
+g_prime = [ 0          ,  0, 0]
+          [-cos(phi)*dt,  1, 0]
+          [ 0           ,dt, 1]
+
+
+measurement estimation
+h(x) = (wall_y - x_y) / cos(phi)
+
+
+
+

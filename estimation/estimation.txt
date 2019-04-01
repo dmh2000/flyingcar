@@ -80,8 +80,8 @@ Recursive least squares
        = aN(Hx,R) @ N(x[0], Q[0])
     2. choose X-hat as MAP
         p(x_hat,y~) = N(x_hat[1],Q[1])
-        Q1 = (Qo^-1 + H.T * R^-1 * H) ^-1
-        x_hat[1] = x_hat[0] + Q[1]*H.T * R^(y~ - H*x_hat[0])
+        Q1 = inv(inv(Qo) + H.T * inv(R) @  H)
+        x_hat[1] = x_hat[0] + Q[1]*H.T @  inv(R) @ (y~ - H*x_hat[0])
 
 Non-Linear Least Squares
     measurements = h(x) are nonlinear

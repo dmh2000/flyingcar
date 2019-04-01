@@ -25,6 +25,11 @@ accumulated_sigma =  np.sqrt(accumulated_sigma**2 + sigma_omega**2 * dt**2)
 
 use 3 sigma envelope
 
+HOW TO USE SIGMA. ITS THE STANDARD DEVIATION OF THE NOISE,
+SO GENERATE A NORMAL DISTRIBUTION
+shape = (3,1)
+noise_error = np.random.normal(0.0,sigma,shape)
+
 full 3d update
 --------------
 derivative of euler angles
@@ -70,6 +75,99 @@ assume psi == 0
 with psi == 0, rotation matrix is
 [phi_dot  ] = [1 sin(phi)tan(theta)][p]
 [theta_dot] = [0 cos(phi)           [q]
+
+Measurement 1 : Attitude
+assume no net force/acceleration
+a_accel = 1/m * (F - Fg)
+        = -1/m * Fg
+
+body frame measurements
+[ax,ay,az] = R * [0,0,-g] =
+[ g sin(theta)        ]
+[-g sin(phi)cos(theta)]
+[-g cos(phi)cos(theta)]
+
+solving for inertia frame
+phi_hat = arctan(ay/az)
+theta_hat = arcsin(ax/g)
+
+Measurement 2 : acceleration
+assume : we know attitude of vehicle
+attitude => rotation matrix -> acceleration
+
+Ab = (1/m * R * Fg) + Ab_accel
+body frame accel  =  accel from gravity + specific acceleration
+
+integrate body frame acceleration to get velocity and position
+
+3D Inertial nav
+    gyro          -> integrate         -> orientation
+    accelerometers -> double integrate -> position
+
+each step has drift
+
+INertial nav + GPS position fix works well
+
+Sensor model errors
+-------------------
+x_hat = bias + (I + M)*x + noise
+I = identity matrix
+M = scaling and cross coupling matrix
+
+bias measured as random walk b_t = b_t-1 + noise
+scaling and cross coupling matrix
+     if nonzero, diagonal terms = slope error
+     off diag -> coupling  (misalignment or interference)
+noise = np.random.normal(mean,sigma,shape)
+
+Offline Calibration
+---------------------
+add bias into state vector
+bias = f(Temperature)
+use least squares to fit bias curve
+
+x = actual
+y = f(x)
+c = numpy.linalg.lstsq(x,y)
+
+Magnetometer
+--------------
+noisy, free of drift
+measure yaw given roll and pitch
+
+if roll/pitch is 0 use arctan(y/x) of difference between body frame and magnetic vector
+
+bias from onboard magnetic material is calibrated out
+
+bisa from external magnetic material can't be calibrated out, so consider it noise
+
+x_hat = b + (I+M)x + n
+
+calibrate bias by turning vehicle and measuring difference from truth at each angle
+
+when computing least squares, the output are the coefficients of the polynomial
+c2*x^2 + c1*x + c0
+
+c2 and c2 are the scaling/cross coupling components
+c0 is the bias
+
+for a scaling_cross_coupling_matrix produced by the least squares, the last column
+contains the bias. the first n rows * columns are a sqaure matrix of the scale
+and cross couple terms
+
+transform matrix
+   c2          c1          c0 (bias)
+[[ 0.75111045  0.65106815  1.29245006]   X
+ [-1.30104558  0.37029305 -0.29814192]]  Y
+I+M
+[[ 0.75111045  0.65106815]
+ [-1.30104558  0.37029305]]
+bias
+[[ 1.29245006]
+ [-0.29814192]]
+
+
+
 
 
 
